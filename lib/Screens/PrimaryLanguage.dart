@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:ruhakids/Screens/MainScreen.dart';
 import 'package:ruhakids/Screens/TakeProfilePicture.dart';
 
 class PrimaryLanguage extends StatefulWidget {
@@ -133,5 +134,9 @@ class _PrimaryLanguage extends State<PrimaryLanguage> {
         )),
       ),
     );
+  }
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 }

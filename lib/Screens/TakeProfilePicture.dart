@@ -18,8 +18,10 @@ class TakeProfilePictureScreen extends StatefulWidget {
 
 class _TakeProfilePictureScreen extends State<TakeProfilePictureScreen> {
   var FileUploaded = false;
-
+  ImagePicker imagePicker = ImagePicker();
   File _image;
+
+  bool makeVisible=false;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +50,6 @@ class _TakeProfilePictureScreen extends State<TakeProfilePictureScreen> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-       _image == null ? Text("Still waiting!") : Image.file(_image),
                      Container(
                         width: 200.w,
                         height: 200.h,
@@ -56,11 +57,11 @@ class _TakeProfilePictureScreen extends State<TakeProfilePictureScreen> {
                         decoration: BoxDecoration(
                             border:
                                 Border.all(color: Color(0xFFFF807B), width: 2),
-                            image: DecorationImage(
-                                image: AssetImage('images/profileAvatar.png')),
+                            image:  _image==null?DecorationImage(
+                                image: AssetImage('images/profileAvatar.png')):DecorationImage(image: FileImage(_image),fit: BoxFit.cover),
                             shape: BoxShape.circle),
                      ),
-                Container(
+                _image!=null?Container(
                   decoration: ShapeDecoration(
                     color: Color(0xFFFF807B),
                     shape: RoundedRectangleBorder(
@@ -73,9 +74,10 @@ class _TakeProfilePictureScreen extends State<TakeProfilePictureScreen> {
                   ),
                   width: 200.w,
                   height: 50.h,
-                  child: FlatButton(
-                    onPressed: () {
+                  child:FlatButton(
+                    onPressed: () async {
                       if (_image==null) {
+
                         Alert(
                           context: context,
                           type: AlertType.success,
@@ -89,7 +91,18 @@ class _TakeProfilePictureScreen extends State<TakeProfilePictureScreen> {
                                     color: Colors.white, fontSize: 20),
                               ),
                               onPressed: (){
-                      getImageFile(ImageSource.gallery);
+                                if(_image==null){
+                                  getImageFile(ImageSource.gallery,context);
+                                }
+                                else{
+                                  setState(() {
+                                    makeVisible=true;
+                                  });
+
+                                  Navigator.pushNamed(context, MainScreen.id);
+                                }
+
+                           Navigator.pop(context);
                       },
                               color: Color.fromRGBO(0, 179, 134, 1.0),
                             ),
@@ -100,7 +113,8 @@ class _TakeProfilePictureScreen extends State<TakeProfilePictureScreen> {
                                     color: Colors.white, fontSize: 20),
                               ),
                               onPressed:(){
-                                getImageFile(ImageSource.camera);
+                                getImageFile(ImageSource.camera,context);
+                                Navigator.pop(context);
                               },
                               gradient: LinearGradient(colors: [
                                 Color.fromRGBO(116, 116, 191, 1.0),
@@ -110,7 +124,7 @@ class _TakeProfilePictureScreen extends State<TakeProfilePictureScreen> {
                           ],
                         ).show();
                       } else {
-                       // Navigator.pushNamed(context, MainScreen.id);
+                        Navigator.pushNamed(context, MainScreen.id);
                       }
                     },
                     child: FileUploaded == false
@@ -131,6 +145,86 @@ class _TakeProfilePictureScreen extends State<TakeProfilePictureScreen> {
                                 fontWeight: FontWeight.w400),
                           ),
                   ),
+                ):Container(),
+                Container(
+                  margin: EdgeInsets.only(top: 10.h),
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFFF807B),
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                          width: 1.4,
+                          style: BorderStyle.solid,
+                          color: Color(0xFFFF807B)),
+                      borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                    ),
+                  ),
+                  width: 200.w,
+                  height: 50.h,
+                  child:FlatButton(
+                    onPressed: () async {
+
+                        Alert(
+                          context: context,
+                          type: AlertType.success,
+                          title: "Select Image from",
+                          desc: "Set a cute picture of your child !",
+                          buttons: [
+                            DialogButton(
+                              child: Text(
+                                "Gallery",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                              onPressed: (){
+
+                                  getImageFile(ImageSource.gallery,context);
+
+                                  setState(() {
+                                    if(makeVisible==false)
+                                    makeVisible=true;
+                                  });
+
+                                Navigator.pop(context);
+                              },
+                              color: Color.fromRGBO(0, 179, 134, 1.0),
+                            ),
+                            DialogButton(
+                              child: Text(
+                                "Camera",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                              onPressed:(){
+                                getImageFile(ImageSource.camera,context);
+                                Navigator.pop(context);
+                              },
+                              gradient: LinearGradient(colors: [
+                                Color.fromRGBO(116, 116, 191, 1.0),
+                                Color.fromRGBO(52, 138, 199, 1.0)
+                              ]),
+                            )
+                          ],
+                        ).show();
+
+                    },
+                    child: FileUploaded == false
+                        ? Text(
+                      "Set Profile Picture",
+                      style: TextStyle(
+                          fontSize: ScreenUtil().setSp(17),
+                          color: Colors.white,
+                          fontFamily: "Roboto",
+                          fontWeight: FontWeight.w400),
+                    )
+                        : Text(
+                      "Reselect Image",
+                      style: TextStyle(
+                          fontSize: ScreenUtil().setSp(17),
+                          color: Colors.white,
+                          fontFamily: "Roboto",
+                          fontWeight: FontWeight.w400),
+                    ),
+                  ),
                 ),
                 Container(
                   width: double.infinity,
@@ -143,16 +237,17 @@ class _TakeProfilePictureScreen extends State<TakeProfilePictureScreen> {
       ),
     );
   }
-Future<void>getImageFile(ImageSource source)async{
-    ImagePicker imagePicker = ImagePicker();
-    try{
+Future<void>getImageFile(ImageSource source,BuildContext Context) async {
       var Image = await imagePicker.getImage(source: source);
       setState(() {
         _image=File(Image.path);
-        FileUploaded=true;
       });
-    }catch(e){print(e);}
+        FileUploaded=true;
 
 
+  }
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 }

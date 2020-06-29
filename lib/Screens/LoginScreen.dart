@@ -198,5 +198,10 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+
+  }
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 }

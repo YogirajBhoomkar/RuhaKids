@@ -64,5 +64,9 @@ class _SplashscreenState extends State<Splashscreen> {
           context, MaterialPageRoute(builder: (context) => LoginScreen()));
     }
 
+  }@override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 }

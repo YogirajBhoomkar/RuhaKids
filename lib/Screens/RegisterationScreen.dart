@@ -180,4 +180,8 @@ class _RegisterationScreen extends State<RegisterationScreen> {
       ),
     );
   }
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
 }

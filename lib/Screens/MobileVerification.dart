@@ -117,4 +117,8 @@ class _MobileVerificationScreen extends State<MobileVerificationScreen> {
       ),
     );
   }
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
 }
