@@ -12,4 +12,8 @@ class _ImagePickerState extends State<ImagePicker> {
 
     );
   }
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
 }
