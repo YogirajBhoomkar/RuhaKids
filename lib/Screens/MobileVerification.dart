@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ruhakids/Screens/MainScreen.dart';
 import 'package:ruhakids/Screens/RegisterationScreen.dart';
+import 'package:ruhakids/Screens/TakeProfilePicture.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -207,7 +208,7 @@ class _MobileVerificationScreen extends State<MobileVerificationScreen> {
           ],
         ).show();
       } else {
-        finalNumber = "91" + MobileVerificationScreen.parentMobile;
+        finalNumber = MobileVerificationScreen.parentMobile;
         loginPrefs.setString('parentMobile', finalNumber);
       }
     } else {
@@ -224,7 +225,13 @@ class _MobileVerificationScreen extends State<MobileVerificationScreen> {
     print(message);
     if (message == "Login Matched") {
       loginPrefs.setBool('isLogged', true);
-      Navigator.pushReplacementNamed(context, MainScreen.id);
+      loginPrefs.setString('passcode', MobileVerificationScreen.passcode);
+      if(RegisterationScreen.visitedRegisterationScreen==true){
+        print("RegistereatioVisited: ${RegisterationScreen.visitedRegisterationScreen}");
+        Navigator.pushReplacementNamed(context, TakeProfilePictureScreen.id);
+      }
+      else
+        Navigator.pushReplacementNamed(context, TakeProfilePictureScreen.id);
     }
   }
 }

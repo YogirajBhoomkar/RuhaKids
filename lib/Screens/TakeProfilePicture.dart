@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
@@ -7,6 +8,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ruhakids/Screens/MainScreen.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 
 class TakeProfilePictureScreen extends StatefulWidget {
   @override
@@ -22,6 +27,8 @@ class _TakeProfilePictureScreen extends State<TakeProfilePictureScreen> {
   File _image;
 
   bool makeVisible = false;
+
+  var kidsId;
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +78,7 @@ class _TakeProfilePictureScreen extends State<TakeProfilePictureScreen> {
                             side: BorderSide(
                                 width: 1.4,
                                 style: BorderStyle.solid,
-                                color: Color(0xFFFF807B)),
+                                color: Color(0xFFFF807B),),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(25.0)),
                           ),
@@ -128,6 +135,7 @@ class _TakeProfilePictureScreen extends State<TakeProfilePictureScreen> {
                                 ],
                               ).show();
                             } else {
+
                               Navigator.pushNamed(context, MainScreen.id);
                             }
                           },
@@ -238,11 +246,40 @@ class _TakeProfilePictureScreen extends State<TakeProfilePictureScreen> {
       ),
     );
   }
-
+  void _upload() async{
+    SharedPreferences loginPrefs = await SharedPreferences.getInstance();
+    var url1 = "https://kidsapp.ruha.co.in/flutterGetStudentId.php";
+    var data = {
+      'parentMobile': loginPrefs.get('parentMobile'),
+    };
+    var response = await http.post(url1, body: json.encode(data));
+    var message = jsonDecode(response.body);
+    setState(() {
+      kidsId = message['kids_id'];
+      print("Kids Id: $kidsId");
+    });
+  }
   Future<void> getImageFile(ImageSource source, BuildContext Context) async {
+    SharedPreferences loginPrefs = await SharedPreferences.getInstance();
     var Image = await imagePicker.getImage(source: source);
     setState(() {
       _image = File(Image.path);
+
+    });
+    if(await _image.exists()){
+      String dir = path.dirname(_image.path);
+      print("Old Path : ${path.basename(_image.path)}");
+      String newPath = path.join(dir, 'KidsId.jpg');
+      print("New Path : ${newPath}");
+
+      loginPrefs.setString('profileImage',newPath);
+    }
+    final Directory directory = await getApplicationDocumentsDirectory();
+    String Directorypath = directory.path;
+    final File newImage = await _image.copy('$Directorypath/$kidsId.jpg');
+    loginPrefs.setString('profileImage', newImage.path);
+    setState(() {
+      _image = newImage;
     });
     FileUploaded = true;
   }

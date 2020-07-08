@@ -20,13 +20,16 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   String dropdownValue = '2-3';
-
+void init(){
+  if(RegisterationScreen.visitedRegisterationScreen==true){
+    setState(() {
+      RegisterationScreen.visitedRegisterationScreen=false;
+    });
+  }
+  super.initState();
+}
   Widget build(BuildContext context) {
-    if (RegisterationScreen.visitedRegisterationScreen == true) {
-      setState(() {
-        RegisterationScreen.visitedRegisterationScreen = null;
-      });
-    }
+
     double defaultScreenWidth = 414.0;
     double defaultScreenHeight = 896.0;
     ScreenUtil.init(context,
@@ -157,8 +160,30 @@ class _LoginScreenState extends State<LoginScreen> {
                       loginPrefs.setString('name', LoginScreen.name);
                       loginPrefs.setString('age', LoginScreen.age);
                       print(LoginScreen.name);
-                      if (LoginScreen.name != null) {
-                        Navigator.pushNamed(context, PrimaryLanguage.id);
+                      if (LoginScreen.name !=null) {
+                        if(LoginScreen.name.length!=0){
+                          Navigator.pushNamed(context, PrimaryLanguage.id);
+                        }else{
+                          Alert(
+                            context: context,
+                            type: AlertType.error,
+                            title: "Error in Registering Student",
+                            desc:
+                            "Please check the age or name entered is correct",
+                            buttons: [
+                              DialogButton(
+                                child: Text(
+                                  "Okay",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20),
+                                ),
+                                onPressed: () => Navigator.pop(context),
+                                width: 120,
+                              )
+                            ],
+                          ).show();
+                        }
+
                       } else {
                         print("from else");
                         Alert(

@@ -10,7 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class PrimaryLanguage extends StatefulWidget {
   @override
   static String id = "PrimaryLanguage";
-  static String primaryLanguage;
+  static String primaryLanguage="English";
 
   @override
   _PrimaryLanguage createState() => _PrimaryLanguage();
@@ -97,6 +97,7 @@ class _PrimaryLanguage extends State<PrimaryLanguage> {
                   setState(() {
                     dropdownValue = newValue;
                     PrimaryLanguage.primaryLanguage=dropdownValue;
+                    print("Primary Language: ${PrimaryLanguage.primaryLanguage}");
                     loginPrefs.setString('primaryLanguage', PrimaryLanguage.primaryLanguage);
                   });
                 },

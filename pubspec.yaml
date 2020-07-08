@@ -35,6 +35,7 @@ dependencies:
   http: ^0.12.1
   flutter_text_to_speech: ^3.0.7
   webview_flutter:
+  path_provider: ^1.6.11
 
 
 dev_dependencies:

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,8 +20,10 @@ class RegisterationScreen extends StatefulWidget {
   static String parentsName=null;
   static String emailAddress=null;
   static String mobileNumber=null;
-  static String flag=null;
+  static String session=null;
   static bool visitedRegisterationScreen;
+
+  static var result;
   @override
   _RegisterationScreen createState() => _RegisterationScreen();
 }
@@ -143,7 +146,7 @@ class _RegisterationScreen extends State<RegisterationScreen> {
               Container(
                 padding: EdgeInsets.only(left: ScreenUtil().setWidth(10)),
                 child: TextField(
-                  keyboardType: TextInputType.text,
+                  keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                       focusedBorder: InputBorder.none,
                       enabledBorder: InputBorder.none,
@@ -156,7 +159,7 @@ class _RegisterationScreen extends State<RegisterationScreen> {
                           fontWeight: FontWeight.w300)),
                   onChanged: (value) {
                     setState(() {
-                      RegisterationScreen.mobileNumber="91"+value;
+                      RegisterationScreen.mobileNumber=value;
                     });
                   },
                 ),
@@ -192,10 +195,38 @@ class _RegisterationScreen extends State<RegisterationScreen> {
                     onPressed: ()async {
                       await getbasicInfo();
                       if(RegisterationScreen.childName!=null && RegisterationScreen.childName.length!=0) {
-                        sendToDatabase();
-                        if (RegisterationScreen.flag != "faliure") {
-                          getPasscode();
-                          Navigator.pushReplacementNamed(context, MobileVerificationScreen.id);
+                        await sendToDatabase();
+                        if (RegisterationScreen.session != null) {
+                          print("going to getPassword");
+                         await getPasscode();
+                          print("Registeration of Result: ${RegisterationScreen.result}");
+                          if(RegisterationScreen.result=="Inserted successfully"){
+                            Navigator.pushReplacementNamed(context, MobileVerificationScreen.id);
+                          }
+                          else{
+                            try{
+                              Alert(
+                                context: context,
+                                type: AlertType.error,
+                                title: "Error in Registering Student",
+                                desc: "Please Retry",
+                                buttons: [
+                                  DialogButton(
+                                    child: Text(
+                                      "Okay",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20),
+                                    ),
+                                    onPressed: () => Navigator.pop(context),
+                                    width: 120,
+                                  )
+                                ],
+                              ).show();
+                            }catch(e){
+                              print(e);
+                            }
+
+                          }
                         }
                       }
                       else{
@@ -203,7 +234,7 @@ class _RegisterationScreen extends State<RegisterationScreen> {
                           context: context,
                           type: AlertType.error,
                           title: "Error in Registering Student",
-                          desc: "Please check if the information filled is correct",
+                          desc: "Either the user is already registered with the same mobile Number or check information filled",
                           buttons: [
                             DialogButton(
                               child: Text(
@@ -247,15 +278,12 @@ class _RegisterationScreen extends State<RegisterationScreen> {
     var response = await http.post(url, body: json.encode(data));
     var message = jsonDecode(response.body);
     loginPrefs.setString('sessionId', message);
-
-      RegisterationScreen.flag=message;
+    setState(() {
+      RegisterationScreen.session=message;
+    });
+      print("From sendtoDatabase: $message");
 
   }
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
-
   void getbasicInfo() async{
     SharedPreferences loginPrefs = await SharedPreferences.getInstance();
     setState(() {
@@ -267,6 +295,7 @@ class _RegisterationScreen extends State<RegisterationScreen> {
 
   void getPasscode() async{
     SharedPreferences loginPrefs = await SharedPreferences.getInstance();
+    print(FileImage(File(loginPrefs.getString('test_image'))));
     String primaryLanguage =loginPrefs.get('primaryLanguage');
     var url="https://kidsapp.ruha.co.in/flutterSendPasscode.php";
     loginPrefs.setString('parentMobile', RegisterationScreen.mobileNumber);
@@ -276,13 +305,18 @@ class _RegisterationScreen extends State<RegisterationScreen> {
       'parentEmail':RegisterationScreen.emailAddress,
       'primaryLanguage': PrimaryLanguage.primaryLanguage,
       'sessionId':loginPrefs.get('sessionId'),
+      'profileImage':File(loginPrefs.getString('test_image')),
     };
     print(data);
     var response = await http.post(url, body: json.encode(data));
     var message = jsonDecode(response.body);
     print(response.body);
-
-      RegisterationScreen.flag=message;
-
+        setState(() {
+          RegisterationScreen.result=message['msg'];
+        });
+      }
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 }
