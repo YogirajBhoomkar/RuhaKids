@@ -1,14 +1,18 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:ruhakids/Screens/PrimaryLanguage.dart';
 import 'package:ruhakids/Screens/RegisterationScreen.dart';
 import 'package:ruhakids/Screens/MobileVerification.dart';
+import 'package:flutter_awesome_alert_box/flutter_awesome_alert_box.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
   static String id = "LoginScreen";
+  static String age = "2-3";
+  static String name = null;
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -16,6 +20,15 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   String dropdownValue = '2-3';
+
+  void init() {
+    if (RegisterationScreen.visitedRegisterationScreen == true) {
+      setState(() {
+        RegisterationScreen.visitedRegisterationScreen = false;
+      });
+    }
+    super.initState();
+  }
 
   Widget build(BuildContext context) {
     double defaultScreenWidth = 414.0;
@@ -87,6 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   onChanged: (String newValue) {
                     setState(() {
                       dropdownValue = newValue;
+                      LoginScreen.age = dropdownValue;
                     });
                   },
                 ),
@@ -96,17 +110,20 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: TextField(
                   keyboardType: TextInputType.text,
                   decoration: InputDecoration(
-                      focusedBorder: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      errorBorder: InputBorder.none,
-                      disabledBorder: InputBorder.none,
-                      hintText: "Enter child's name here.",
-                      hintStyle: TextStyle(
-                          fontFamily: "Roboto",
-                          fontSize: ScreenUtil().setSp(17),
-                          fontWeight: FontWeight.w300)),
+                    focusedBorder: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    hintText: "Enter child's name here.",
+                    hintStyle: TextStyle(
+                        fontFamily: "Roboto",
+                        fontSize: ScreenUtil().setSp(17),
+                        fontWeight: FontWeight.w300),
+                  ),
                   onChanged: (value) {
-                    print(value);
+                    setState(() {
+                      LoginScreen.name = value;
+                    });
                   },
                 ),
                 height: 50.h,
@@ -138,8 +155,62 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: 300.w,
                 height: 50.h,
                 child: FlatButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, RegisterationScreen.id);
+                    onPressed: () async {
+                      SharedPreferences loginPrefs =
+                          await SharedPreferences.getInstance();
+                      loginPrefs.setString('name', LoginScreen.name);
+                      loginPrefs.setString('age', LoginScreen.age);
+                      if (LoginScreen.name != null) {
+                        if (LoginScreen.name.length != 0) {
+                          Navigator.pushNamed(context, PrimaryLanguage.id);
+                        } else {
+//                          Alert(
+//                            context: context,
+//                            type: AlertType.error,
+//                            title: "Error in Registering Student",
+//                            desc:
+//                            "Please check the age or name entered is correct",
+//                            buttons: [
+//                              DialogButton(
+//                                child: Text(
+//                                  "Okay",
+//                                  style: TextStyle(
+//                                      color: Colors.white, fontSize: 20),
+//                                ),
+//                                onPressed: () => Navigator.pop(context),
+//                                width: 120,
+//                              )
+//                            ],
+//                          ).show();
+                          DangerAlertBoxCenter(
+                            context: context,
+                            titleTextColor: Colors.redAccent,
+                            messageText:
+                                "Please check the age or name entered is incorrect",
+                            buttonText: "Okay",
+                          );
+                        }
+                      } else {
+//                        Alert(
+//                          context: context,
+//                          type: AlertType.error,
+//                          title: "Error in Registering Student",
+//                          desc:
+//                              "Please check the age or name entered is correct",
+//                          buttons: [
+//                            DialogButton(
+//                              child: Text(
+//                                "Okay",
+//                                style: TextStyle(
+//                                    color: Colors.white, fontSize: 20),
+//                              ),
+//                              onPressed: () => Navigator.pop(context),
+//                              width: 120,
+//                            )
+//                          ],
+//                        ).show();
+//                        DangerAlertBoxCenter(context: context,titleTextColor: Colors.redAccent,messageText:"Please check the age or name entered is correct",buttonText: "Okay",);
+                      }
                     },
                     child: Text(
                       "Register",
@@ -155,9 +226,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Color(0xFFFFC400),
                   shape: RoundedRectangleBorder(
                     side: BorderSide(
-                        width: 1.4,
-                        style: BorderStyle.solid,
-                        color: Color(0xFFFFC402)),
+                      width: 1.4,
+                      style: BorderStyle.solid,
+                      color: Color(0xFFFFC402),
+                    ),
                     borderRadius: BorderRadius.all(Radius.circular(12.0)),
                   ),
                 ),
@@ -165,32 +237,40 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: 300.w,
                 height: 50.h,
                 child: FlatButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, MobileVerificationScreen.id);
-                    },
-                    child: Text(
-                      "Enter Passcode",
-                      style: TextStyle(
-                          fontSize: ScreenUtil().setSp(17),
-                          color: Colors.white,
-                          fontFamily: "Roboto",
-                          fontWeight: FontWeight.w400),
-                    ),
+                  onPressed: () {
+                    setState(() {
+                      RegisterationScreen.visitedRegisterationScreen = false;
+                    });
+
+                    Navigator.pushNamed(context, MobileVerificationScreen.id);
+                  },
+                  child: Text(
+                    "Enter Passcode",
+                    style: TextStyle(
+                        fontSize: ScreenUtil().setSp(17),
+                        color: Colors.white,
+                        fontFamily: "Roboto",
+                        fontWeight: FontWeight.w400),
+                  ),
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(bottom:10.h,right: 15.w),
+                padding: EdgeInsets.only(bottom: 10.h, right: 15.w),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
-                  children:[Container(
-                    constraints: BoxConstraints.expand(width: 250.w,height: 245.h),
-                    width: 250.w,
-                    height: 150.h,
-                    decoration: BoxDecoration(
-                    image: DecorationImage(image: AssetImage('images/kidsStudy.jpg'),fit: BoxFit.cover),
+                  children: [
+                    Container(
+                      constraints:
+                          BoxConstraints.expand(width: 250.w, height: 245.h),
+                      width: 250.w,
+                      height: 150.h,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: AssetImage('images/kidsStudy.jpg'),
+                            fit: BoxFit.cover),
+                      ),
                     ),
-                  ),],
-
+                  ],
                 ),
               ),
             ],
@@ -198,5 +278,9 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  void dispose() {
+    super.dispose();
   }
 }

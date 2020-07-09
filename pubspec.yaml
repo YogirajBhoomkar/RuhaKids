@@ -27,11 +27,16 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^0.1.3
-  shared_preferences: ^0.5.7+3
-  flutter_screenutil: ^1.1.0
-  rflutter_alert: ^1.0.3
-  image_picker: ^0.6.7+2
+  cupertino_icons:
+  shared_preferences:
+  flutter_screenutil:
+  image_picker:
+  http:
+  flutter_text_to_speech:
+  webview_flutter:
+  flutter_awesome_alert_box:
+  email_validator:
+
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +57,7 @@ flutter:
   assets:
     - images/
     - images/splashChildren.png
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

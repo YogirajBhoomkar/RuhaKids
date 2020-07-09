@@ -3,11 +3,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:ruhakids/Screens/TakeProfilePicture.dart';
+import 'package:ruhakids/Screens/RegisterationScreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PrimaryLanguage extends StatefulWidget {
   @override
   static String id = "PrimaryLanguage";
+  static String primaryLanguage = "English";
 
   @override
   _PrimaryLanguage createState() => _PrimaryLanguage();
@@ -26,12 +28,13 @@ class _PrimaryLanguage extends State<PrimaryLanguage> {
         allowFontScaling: false);
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.white,
         body: Center(
             child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Container(
-              margin: EdgeInsets.only(top: ScreenUtil().setHeight(100)),
+              margin: EdgeInsets.only(top: ScreenUtil().setHeight(50)),
               child: Text(
                 "Select your\nPrimary Language !",
                 style: TextStyle(
@@ -88,9 +91,14 @@ class _PrimaryLanguage extends State<PrimaryLanguage> {
                 ),
                 iconSize: 24,
                 elevation: 16,
-                onChanged: (String newValue) {
+                onChanged: (String newValue) async {
+                  SharedPreferences loginPrefs =
+                      await SharedPreferences.getInstance();
                   setState(() {
                     dropdownValue = newValue;
+                    PrimaryLanguage.primaryLanguage = dropdownValue;
+                    loginPrefs.setString(
+                        'primaryLanguage', PrimaryLanguage.primaryLanguage);
                   });
                 },
               ),
@@ -106,12 +114,13 @@ class _PrimaryLanguage extends State<PrimaryLanguage> {
                   borderRadius: BorderRadius.all(Radius.circular(25.0)),
                 ),
               ),
-              margin: EdgeInsets.only(top: 30.h),
+              margin: EdgeInsets.only(top: 20.h),
               width: 250.w,
               height: 50.h,
               child: FlatButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, TakeProfilePictureScreen.id);
+                  Navigator.pushReplacementNamed(
+                      context, RegisterationScreen.id);
                 },
                 child: Text(
                   "Next",
@@ -125,7 +134,7 @@ class _PrimaryLanguage extends State<PrimaryLanguage> {
             ),
             Center(
               child: Container(
-                width: double.infinity,
+                width: 320.w,
                 child: Image.asset('images/PeopleLanguages.png'),
               ),
             ),
@@ -133,5 +142,9 @@ class _PrimaryLanguage extends State<PrimaryLanguage> {
         )),
       ),
     );
+  }
+
+  void dispose() {
+    super.dispose();
   }
 }

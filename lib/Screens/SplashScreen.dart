@@ -5,15 +5,14 @@ import 'package:ruhakids/Screens/MainScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class Splashscreen  extends StatefulWidget {
-  static String id="Splashscreen";
+class Splashscreen extends StatefulWidget {
+  static String id = "Splashscreen";
 
   @override
   _SplashscreenState createState() => _SplashscreenState();
 }
 
 class _SplashscreenState extends State<Splashscreen> {
-
   void initState() {
     super.initState();
     startTime();
@@ -29,40 +28,44 @@ class _SplashscreenState extends State<Splashscreen> {
         allowFontScaling: false);
     return Center(
       child: Stack(
-        children:[ Container(
-          constraints: BoxConstraints.expand(),
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('images/splashChildren.png'),
-              fit: BoxFit.fill,
+        children: [
+          Container(
+            constraints: BoxConstraints.expand(),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('images/splashChildren.png'),
+                fit: BoxFit.fill,
+              ),
             ),
           ),
-        ),
-          Padding(padding:EdgeInsets.symmetric(horizontal: 60.w,vertical: 120.h),child: Container(child: Image.asset('images/Logo.png'))),
+          Padding(
+              padding: EdgeInsets.symmetric(horizontal: 60.w, vertical: 120.h),
+              child: Container(child: Image.asset('images/Logo.png'))),
         ],
-
       ),
     );
   }
-  startTime() async {
 
+  startTime() async {
     var duration = new Duration(seconds: 5);
     return new Timer(duration, route);
   }
 
-  route() async{
+  route() async {
     SharedPreferences loginPrefs = await SharedPreferences.getInstance();
-    if(loginPrefs.get('isLogged')==null) {
+    if (loginPrefs.get('isLogged') == null) {
       loginPrefs.setBool('isLogged', false);
     }
-    if(loginPrefs.getBool('isLogged')){
-
+    if (loginPrefs.getBool('isLogged')) {
       Navigator.pushReplacementNamed(context, MainScreen.id);
-    }else{
-      print(loginPrefs.getBool('isLogged'));
+    } else {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => LoginScreen()));
     }
+  }
 
+  @override
+  void dispose() {
+    super.dispose();
   }
 }
